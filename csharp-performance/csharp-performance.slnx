@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CatalogApp/CatalogApp.csproj" />
+  <Project Path="performance-helper/performance-helper.csproj" />
+</Solution>
