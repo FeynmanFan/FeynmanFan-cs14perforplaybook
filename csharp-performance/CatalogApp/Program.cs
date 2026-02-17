@@ -8,6 +8,13 @@ namespace CatalogApp
 
             // Add services to the container.
             builder.Services.AddRazorPages();
+            builder.Services.AddHttpClient();
+
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:2112";   // Change if your Redis is elsewhere
+                options.InstanceName = "FuelCache_";
+            });
 
             var app = builder.Build();
 

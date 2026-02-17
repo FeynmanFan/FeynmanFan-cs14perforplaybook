@@ -1,0 +1,29 @@
+﻿@page
+@model CatalogApp.Pages.FuelModel
+
+<h1>Fuel Price Checker</h1>
+
+<form method="post">
+    <label for="AirportCode">Airport Code:</label>
+    <input asp-for="AirportCode" class="form-control w-25 d-inline" id="AirportCode" />
+
+    <button type="submit" asp-page-handler="Direct" class="btn btn-primary ms-2">Direct API Call</button>
+    <button type="submit" asp-page-handler="Cached" class="btn btn-success ms-2">Cached Version (Redis)</button>
+</form>
+
+<hr />
+
+@if (Model.Result != null)
+{
+    <div class="alert @(Model.StatusMessage.Contains("Cache") ? "alert-success" : "alert-info")">
+        <h4>@Model.Result.AirportCode Fuel Price</h4>
+        <h2>$@Model.Result.FuelPriceUsdPerGallon</h2>
+        <p><strong>Time taken:</strong> @Model.ElapsedSeconds seconds</p>
+        <p><strong>Status:</strong> @Model.StatusMessage</p>
+        <small>@Model.Result.Timestamp.ToLocalTime()</small>
+    </div>
+}
+else if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-danger">@Model.StatusMessage</div>
+}
