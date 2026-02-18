@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../rediscache-docker.txt" />
+  </Folder>
   <Project Path="CatalogApp.Benchmarking/CatalogApp.Benchmarking.csproj" Id="01e60e17-c1da-4fab-b641-ab2b92df30fe" />
   <Project Path="CatalogApp/CatalogApp.csproj" />
   <Project Path="FuelAPI/FuelAPI.csproj" Id="289215b2-ec1c-44e9-9dcc-cb3fbed41f8d" />
