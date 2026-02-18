@@ -3,17 +3,18 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
 using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace CatalogApp.Pages
 {
     public class FuelModel : PageModel
     {
         private readonly HttpClient _httpClient;
-        private readonly IDistributedCache _cache;
+        private readonly HybridCache _cache;
 
         private const string URL_TEMPLATE = "https://localhost:7106/api/fuel/";
 
-        public FuelModel(HttpClient httpClient, IDistributedCache cache)
+        public FuelModel(HttpClient httpClient, HybridCache cache)
         {
             _httpClient = httpClient;
             _cache = cache;
@@ -66,37 +67,28 @@ namespace CatalogApp.Pages
             try
             {
                 // 1. Try to get from Redis cache
-                var cachedJson = await _cache.GetStringAsync(cacheKey);
-
-                if (!string.IsNullOrEmpty(cachedJson))
+                Result = await _cache.GetOrCreateAsync(key: cacheKey, async ct =>
                 {
-                    Result = JsonSerializer.Deserialize<FuelPriceResponse>(cachedJson,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    StatusMessage = "Cache miss - fetching from API...";
 
-                    StatusMessage = "Served from Redis Cache";
-                }
-                else
-                {
-                    // 2. Cache miss → call the slow API
-                    StatusMessage = "Cache miss - calling API...";
+                    var response = await _httpClient.GetAsync($"{URL_TEMPLATE}{AirportCode}", ct);
 
-                    var response = await _httpClient.GetAsync($"{URL_TEMPLATE}{AirportCode}");
                     response.EnsureSuccessStatusCode();
 
-                    var json = await response.Content.ReadAsStringAsync();
-                    Result = JsonSerializer.Deserialize<FuelPriceResponse>(json,
+                    var json = await response.Content.ReadAsStringAsync(ct);
+                    var data = JsonSerializer.Deserialize<FuelPriceResponse>(json,
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                    // 3. Store in Redis for 5 minutes (300 seconds)
-                    var cacheOptions = new DistributedCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-                    };
+                    StatusMessage = "Fetched from API and stored in cache";
 
-                    await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(Result), cacheOptions);
-
-                    StatusMessage = "Fetched from API and stored in Redis Cache";
+                    return data;
+                }, 
+                options: new HybridCacheEntryOptions
+                {
+                    Expiration = TimeSpan.FromMinutes(5),
+                    LocalCacheExpiration = TimeSpan.FromSeconds(30) // Local cache is much shorter to demonstrate cache hit/miss
                 }
+                );
             }
             catch (Exception ex)
             {

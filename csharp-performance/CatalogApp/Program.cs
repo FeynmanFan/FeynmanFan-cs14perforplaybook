@@ -10,6 +10,8 @@ namespace CatalogApp
             builder.Services.AddRazorPages();
             builder.Services.AddHttpClient();
 
+            builder.Services.AddHybridCache();
+
             builder.Services.AddStackExchangeRedisCache(options =>
             {
                 options.Configuration = "localhost:2112";   // Change if your Redis is elsewhere
