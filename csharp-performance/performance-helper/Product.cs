@@ -1,8 +1,8 @@
-﻿using System.Buffers;
-using System.Text;
-
-namespace performance_helper
+﻿namespace performance_helper
 {
+    using System.Buffers;
+    using System.Text;
+
     public class Product
     {
         public string Id { get; internal set; }

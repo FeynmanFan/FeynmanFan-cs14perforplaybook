@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using performance_helper;
-using System.Text;
-
-namespace CatalogApp.Pages
+﻿namespace CatalogApp.Pages
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.RazorPages;
+    using performance_helper;
+
     public class ExportModel : PageModel
     {
         [BindProperty(SupportsGet = true)]
