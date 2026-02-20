@@ -1,4 +1,6 @@
-﻿namespace performance_helper
+﻿using System.Text;
+
+namespace performance_helper
 {
     public class DataHelper()
     {
@@ -32,6 +34,42 @@
             }
 
             return products;
+        }
+
+        public static void CreateLargeTestFile(string path, int size = 1)
+        {
+            long targetSizeBytes = 25_000;
+
+            var line = "2025-02-19T12:34:56.789Z|KDFW|Jet-A|172.45|USD|gallon|SupplierX|Remarks: none\n";
+            var bytes = Encoding.UTF8.GetBytes(line);
+
+            using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 81920, useAsync: true);
+
+            long written = 0;
+            while (written < targetSizeBytes * size)
+            {
+                fs.Write(bytes);
+                written += bytes.Length;
+            }
+        }
+
+        public static async Task CreateLargeGameAssetFileAsync(string path, long sizeInBytes)
+        {
+            // Simulate realistic game asset data: 64KB "resource chunks"
+            var chunk = new byte[65536];
+            Random.Shared.NextBytes(chunk);
+
+            await using var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 131072, true);
+
+            long written = 0;
+            while (written < sizeInBytes)
+            {
+                int toWrite = (int)Math.Min(chunk.Length, sizeInBytes - written);
+                await fs.WriteAsync(chunk.AsMemory(0, toWrite));
+                written += toWrite;
+            }
+
+            Console.WriteLine("File created successfully.");
         }
     }
 }
