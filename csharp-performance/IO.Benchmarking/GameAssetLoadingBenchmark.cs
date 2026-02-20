@@ -36,7 +36,7 @@ namespace GameAssetLoadingBenchmarks
         }
 
         /// <summary>
-        /// Stack-safe version of the stream code, FYI.
+        /// Stack-safe version of the stream code, FYI. 
         /// Actual run results on my machine:
         //  | Method                          | FileSizeBytes | Mean         | Error         | StdDev     | Ratio | RatioSD | Gen0      | Allocated  | Alloc Ratio |
         //|-------------------------------- |-------------- |-------------:|--------------:|-----------:|------:|--------:|----------:|-----------:|------------:|

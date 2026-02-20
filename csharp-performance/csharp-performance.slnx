@@ -7,6 +7,7 @@
   <Project Path="CatalogApp/CatalogApp.csproj" />
   <Project Path="FuelAPI/FuelAPI.csproj" Id="289215b2-ec1c-44e9-9dcc-cb3fbed41f8d" />
   <Project Path="IO.Benchmarking/IO.Benchmarking.csproj" Id="22068b95-8b33-4241-b246-586aa5605d35" />
+  <Project Path="Memory.Benchmarking/Memory.Benchmarking.csproj" Id="a882e8a1-4ce9-4193-a16f-b7d0811f9511" />
   <Project Path="performance-helper/performance-helper.csproj" />
   <Project Path="QueueDemo.Consumer/QueueDemo.Consumer.csproj" Id="4d0e10d8-6ff2-4987-bd09-711e00a78c02" />
   <Project Path="QueueDemo/QueueDemo.Publisher.csproj" Id="e85291e2-10ff-4a63-986a-27bb656b85cc" />
