@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using System.Buffers;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
 
@@ -34,26 +35,65 @@ namespace GameAssetLoadingBenchmarks
             _filePath = Path.Combine(OUTPUT_PATH, _filePath);
         }
 
-        // ===================================================================
-        // 1. Classic FileStream (Random Access)
-        // ===================================================================
+        /// <summary>
+        /// Stack-safe version of the stream code, FYI.
+        /// Actual run results on my machine:
+        //  | Method                          | FileSizeBytes | Mean         | Error         | StdDev     | Ratio | RatioSD | Gen0      | Allocated  | Alloc Ratio |
+        //|-------------------------------- |-------------- |-------------:|--------------:|-----------:|------:|--------:|----------:|-----------:|------------:|
+        //| Stream_RandomResourceLoad       | 5000000       |  3,616.84 ms |  1,963.086 ms | 107.603 ms | 1.001 |    0.04 | 8000.0000 | 17582048 B |       1.000 |
+        //| MemoryMapped_RandomResourceLoad | 5000000       |     11.55 ms |      6.937 ms |   0.380 ms | 0.003 |    0.00 |         - |      298 B |       0.000 |
+        //|                                 |               |              |               |            |       |         |           |            |             |
+        //| Stream_RandomResourceLoad       | 8000000000    | 20,316.51 ms | 14,138.582 ms | 774.983 ms |  1.00 |    0.05 | 8000.0000 | 17610736 B |       1.000 |
+        //| MemoryMapped_RandomResourceLoad | 8000000000    |    554.47 ms |    468.372 ms |  25.673 ms |  0.03 |    0.00 |         - |     1088 B |       0.000 |
+        /// </summary>
         [Benchmark(Baseline = true)]
         public long Stream_RandomResourceLoad()
         {
             long sum = 0;
+
             using var fs = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, true);
 
-            for (int i = 0; i < NumResourceLoads; i++)
+            byte[] buffer = ArrayPool<byte>.Shared.Rent(64);
+            try
             {
-                long offset = (long)(_random.NextDouble() * (FileSizeBytes - 64));
-                fs.Seek(offset, SeekOrigin.Begin);
+                Span<byte> bufSpan = buffer.AsSpan(0, 64);
 
-                Span<byte> buffer = stackalloc byte[64];
-                fs.Read(buffer);
-                sum += MemoryMarshal.Read<long>(buffer); // simulate using the data
+                for (int i = 0; i < NumResourceLoads; i++)
+                {
+                    long offset = (long)(_random.NextDouble() * (FileSizeBytes - 64));
+                    fs.Seek(offset, SeekOrigin.Begin);
+                    fs.ReadExactly(bufSpan);
+                    sum += MemoryMarshal.Read<long>(bufSpan);
+                }
             }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
+
             return sum;
         }
+
+        //// ===================================================================
+        //// 1. Classic FileStream (Random Access)
+        //// ===================================================================
+        //[Benchmark(Baseline = true)]
+        //public long Stream_RandomResourceLoad()
+        //{
+        //    long sum = 0;
+        //    using var fs = new FileStream(_filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 8192, true);
+
+        //    for (int i = 0; i < NumResourceLoads; i++)
+        //    {
+        //        long offset = (long)(_random.NextDouble() * (FileSizeBytes - 64));
+        //        fs.Seek(offset, SeekOrigin.Begin);
+
+        //        Span<byte> buffer = stackalloc byte[64];
+        //        fs.Read(buffer);
+        //        sum += MemoryMarshal.Read<long>(buffer); // simulate using the data
+        //    }
+        //    return sum;
+        //}
 
         // ===================================================================
         // 2. Memory-Mapped File (Random Access)
