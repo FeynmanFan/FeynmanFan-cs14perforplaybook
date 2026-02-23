@@ -22,7 +22,7 @@ namespace Memory.Benchmarking
                 int size = _random.Next(64, 8193);           // random size 64–8192 bytes
                 byte[] buffer = new byte[size];
                 buffer[0] = (byte)i;
-                sum += buffer[0];
+                sum += buffer[0];   
             }
             return sum;
         }

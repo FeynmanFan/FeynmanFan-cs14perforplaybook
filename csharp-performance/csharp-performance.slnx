@@ -5,6 +5,7 @@
   </Folder>
   <Project Path="CatalogApp.Benchmarking/CatalogApp.Benchmarking.csproj" Id="01e60e17-c1da-4fab-b641-ab2b92df30fe" />
   <Project Path="CatalogApp/CatalogApp.csproj" />
+  <Project Path="Compute.Benchmarking/Compute.Benchmarking.csproj" Id="8d8e2776-1b02-41aa-83bb-c12bcef8900f" />
   <Project Path="FuelAPI/FuelAPI.csproj" Id="289215b2-ec1c-44e9-9dcc-cb3fbed41f8d" />
   <Project Path="IO.Benchmarking/IO.Benchmarking.csproj" Id="22068b95-8b33-4241-b246-586aa5605d35" />
   <Project Path="Memory.Benchmarking/Memory.Benchmarking.csproj" Id="a882e8a1-4ce9-4193-a16f-b7d0811f9511" />
