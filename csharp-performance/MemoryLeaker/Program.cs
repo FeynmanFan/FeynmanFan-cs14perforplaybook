@@ -1,15 +1,25 @@
 ﻿namespace MemoryLeaker
 {
+    using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Collections.Generic;
+    using System.Security.Authentication.ExtendedProtection;
 
     class Program
     {
-        // This static list keeps growing forever → classic leak
-        private static readonly List<byte[]> _leakCache = new List<byte[]>();
-
         static void Main()
         {
+            var services = new ServiceCollection();
+            services.AddMemoryCache(options =>
+            {
+                options.SizeLimit = 100 * 1024 * 1024; // 100 MB limit to trigger eviction
+                options.CompactionPercentage = .20; // Evict 20% when limit is exceeded
+            });
+
+            var provider = services.BuildServiceProvider();
+            var cache = provider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
+
             Console.WriteLine("Press any key to start leaking...");
             Console.ReadKey();
 
@@ -22,7 +32,16 @@
                 for (int i = 0; i < chunk.Length; i += 1000)
                     chunk[i] = (byte)(iteration % 256);
 
-                _leakCache.Add(chunk);
+
+                var entryOptions = new MemoryCacheEntryOptions
+                {
+                    Size = chunk.Length,
+                    SlidingExpiration = TimeSpan.FromMinutes(15), // Keep it alive for a while
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) // Ensure it doesn't expire too soon
+                };
+
+                var key = $"leak_{iteration}";
+                cache.Set(key, chunk, entryOptions);
 
                 iteration++;
                 Console.WriteLine($"Iteration {iteration} — leaked {iteration * 10} MB so far...");
