@@ -1,55 +1,46 @@
-﻿namespace MemoryLeaker
+﻿using System.Collections.Concurrent;
+
+class Program
 {
-    using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.DependencyInjection;
-    using System;
-    using System.Collections.Generic;
-    using System.Security.Authentication.ExtendedProtection;
+    private static readonly ConcurrentQueue<byte[]> _boundedQueue = new();
+    private static readonly long MaxTotalBytes = 100_000_000; // 100 MB limit
+    private static long _currentBytes;
 
-    class Program
+    static void Main()
     {
-        static void Main()
+        Console.WriteLine("Press any key to start...");
+        Console.ReadKey();
+
+        int iteration = 0;
+
+        while (true)
         {
-            var services = new ServiceCollection();
-            services.AddMemoryCache(options =>
+            byte[] chunk = new byte[10 * 1024 * 1024];
+            for (int i = 0; i < chunk.Length; i += 1000)
+                chunk[i] = (byte)(iteration % 256);
+
+            // Manual FIFO eviction
+            lock (_boundedQueue) // needed for _currentBytes atomicity
             {
-                options.SizeLimit = 100 * 1024 * 1024; // 100 MB limit to trigger eviction
-                options.CompactionPercentage = .20; // Evict 20% when limit is exceeded
-            });
-
-            var provider = services.BuildServiceProvider();
-            var cache = provider.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>();
-
-            Console.WriteLine("Press any key to start leaking...");
-            Console.ReadKey();
-
-            int iteration = 0;
-
-            while (true)
-            {
-                // Allocate ~10 MB per iteration and keep reference forever
-                byte[] chunk = new byte[10 * 1024 * 1024];
-                for (int i = 0; i < chunk.Length; i += 1000)
-                    chunk[i] = (byte)(iteration % 256);
-
-
-                var entryOptions = new MemoryCacheEntryOptions
+                if (_currentBytes + chunk.Length > MaxTotalBytes)
                 {
-                    Size = chunk.Length,
-                    SlidingExpiration = TimeSpan.FromMinutes(15), // Keep it alive for a while
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1) // Ensure it doesn't expire too soon
-                };
+                    Console.WriteLine($"Queue limit exceeded. Current: {_currentBytes / 1_000_000} MB, trying to add: {chunk.Length / 1_000_000} MB");
 
-                var key = $"leak_{iteration}";
-                cache.Set(key, chunk, entryOptions);
+                    while (_boundedQueue.TryDequeue(out byte[] old))
+                    {
+                        _currentBytes -= old.Length;
+                    }
+                }
 
-                iteration++;
-                Console.WriteLine($"Iteration {iteration} — leaked {iteration * 10} MB so far...");
-
-                // Let it run long enough to see memory grow in Task Manager
-                if (iteration % 10 == 0)
-                    Console.ReadKey(); // pause occasionally so you can observe
+                _boundedQueue.Enqueue(chunk);
+                _currentBytes += chunk.Length;
             }
+
+            iteration++;
+            Console.WriteLine($"Iteration {iteration} — stored {iteration * 10} MB so far (current queue size: {_currentBytes / 1_000_000} MB)");
+
+            if (iteration % 10 == 0)
+                Console.ReadKey();
         }
     }
 }
