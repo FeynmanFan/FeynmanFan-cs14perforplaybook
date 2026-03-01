@@ -1,48 +1,46 @@
-﻿namespace MemoryLeaker
+﻿using System.Collections.Concurrent;
+
+class Program
 {
-    using System;
-    using System.Collections.Generic;
+    private static readonly ConcurrentQueue<byte[]> _boundedQueue = new();
+    private static readonly long MaxTotalBytes = 100_000_000; // 100 MB limit
+    private static long _currentBytes;
 
-    class Program
+    static void Main()
     {
-        // This static list keeps growing forever → classic leak
-        private static readonly List<byte[]> _leakCache = new List<byte[]>();
+        Console.WriteLine("Press any key to start...");
+        Console.ReadKey();
 
-        static void Main()
+        int iteration = 0;
+
+        while (true)
         {
-            Console.WriteLine("Press any key to start leaking...");
-            Console.ReadKey();
+            byte[] chunk = new byte[10 * 1024 * 1024];
+            for (int i = 0; i < chunk.Length; i += 1000)
+                chunk[i] = (byte)(iteration % 256);
 
-            int iteration = 0;
-
-            while (true)
+            // Manual FIFO eviction
+            lock (_boundedQueue) // needed for _currentBytes atomicity
             {
-                // Allocate ~10 MB per iteration and keep reference forever
-                byte[] chunk = new byte[10 * 1024 * 1024];
-                for (int i = 0; i < chunk.Length; i += 1000)
-                    chunk[i] = (byte)(iteration % 256);
-
-                _leakCache.Add(chunk);
-
-                iteration++;
-                Console.WriteLine($"Iteration {iteration} — leaked {iteration * 10} MB so far...");
-
-                try
+                if (_currentBytes + chunk.Length > MaxTotalBytes)
                 {
-                    if (iteration >= 40)
+                    Console.WriteLine($"Queue limit exceeded. Current: {_currentBytes / 1_000_000} MB, trying to add: {chunk.Length / 1_000_000} MB");
+
+                    while (_boundedQueue.TryDequeue(out byte[] old))
                     {
-                        throw new InvalidOperationException("Simulated crash after leaking 400 MB. Check Task Manager to see the memory usage.");
+                        _currentBytes -= old.Length;
                     }
                 }
-                catch(InvalidOperationException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
 
-                // Let it run long enough to see memory grow in Task Manager
-                if (iteration % 10 == 0)
-                    Console.ReadKey(); // pause occasionally so you can observe
+                _boundedQueue.Enqueue(chunk);
+                _currentBytes += chunk.Length;
             }
+
+            iteration++;
+            Console.WriteLine($"Iteration {iteration} — stored {iteration * 10} MB so far (current queue size: {_currentBytes / 1_000_000} MB)");
+
+            if (iteration % 10 == 0)
+                Console.ReadKey();
         }
     }
 }
