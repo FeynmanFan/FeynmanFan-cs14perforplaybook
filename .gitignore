@@ -416,3 +416,6 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/MemoryLeaker.dmp
+/MemoryLeaker2.dmp
+/csharp-performance/.idea/.idea.csharp-performance/.idea
