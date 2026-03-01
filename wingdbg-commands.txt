@@ -1,0 +1,11 @@
+symfix+ # load Microsoft Symbols server
+.reload # reload whatever symbols are loaded
+!analyze -v # perform exception analysis on the dump
+!dumpheap -stat # list the contents organized statistically
+!pe # show the current managed exception 
+!threads #list the threads
+~0s # select thread 0
+!pe
+~1s # select thread 1
+!clrstack # dump the stack
+!dumpheap -stat -type Exception # show the contents of the heap filtering by type Exception (and all inheritors)

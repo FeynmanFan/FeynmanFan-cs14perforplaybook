@@ -12,6 +12,8 @@
   <Project Path="MemoryLeaker/MemoryLeaker.csproj" Id="3b27b7e2-d869-4282-a7fa-bdc01765f0ea" />
   <Project Path="Parallel.Benchmarking/Parallel.Benchmarking.csproj" Id="bef3e770-9613-428f-b9c5-4bc3e5da08cf" />
   <Project Path="performance-helper/performance-helper.csproj" />
+  <Project Path="Products.Data.Benchmarks/Products.Data.Benchmarks.csproj" Id="c0eb828d-c338-4e28-ab46-93a4ad653ffd" />
+  <Project Path="Products.Data/Products.Data.csproj" Id="6be0fba9-961e-46fb-a34e-23fdf55dfb54" />
   <Project Path="QueueDemo.Consumer/QueueDemo.Consumer.csproj" Id="4d0e10d8-6ff2-4987-bd09-711e00a78c02" />
   <Project Path="QueueDemo/QueueDemo.Publisher.csproj" Id="e85291e2-10ff-4a63-986a-27bb656b85cc" />
 </Solution>

@@ -27,6 +27,18 @@
                 iteration++;
                 Console.WriteLine($"Iteration {iteration} — leaked {iteration * 10} MB so far...");
 
+                try
+                {
+                    if (iteration >= 40)
+                    {
+                        throw new InvalidOperationException("Simulated crash after leaking 400 MB. Check Task Manager to see the memory usage.");
+                    }
+                }
+                catch(InvalidOperationException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
                 // Let it run long enough to see memory grow in Task Manager
                 if (iteration % 10 == 0)
                     Console.ReadKey(); // pause occasionally so you can observe
