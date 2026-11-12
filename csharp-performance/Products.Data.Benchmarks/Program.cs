@@ -7,7 +7,7 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string ClientSecret = "ThisIsAFakeAzureADClientSecret1234567890AbCdEfGhIjKlMnOpQrStUvWxYz";
+            const string ClientSecret = "q8w4T~qhc5JRK8rspcWBwV~IPVHFlE7vs3rsP";
 
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
