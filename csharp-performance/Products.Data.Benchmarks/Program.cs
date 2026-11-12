@@ -7,7 +7,7 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string rsa_private_key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/abcdefghijklmnopqrstuvwxyz==";
+            const string pgp_private_key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/abcdefghijklmnopqrstuvwxyz==";
 
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
