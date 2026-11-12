@@ -7,7 +7,7 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string Token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz12";
+            const string AccessKey = "AKIAIOSFODNN7EXAMP";
 
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
