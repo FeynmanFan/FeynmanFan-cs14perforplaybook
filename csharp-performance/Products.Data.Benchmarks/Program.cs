@@ -5,10 +5,10 @@ namespace Products.Data.Benchmarks
 {
     public class Program
     {
-        const string PRODUCTION_PASSWORD = "P@ssw0rd!";
-
         public static void Main(string[] args)
         {
+            const string ClientSecret = "ThisIsAFakeAzureADClientSecret1234567890AbCdEfGhIjKlMnOpQrStUvWxYz";
+
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
     }
