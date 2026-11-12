@@ -7,8 +7,6 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string AccessKey = "AKIAIOSFODNN7EXAMP";
-
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
     }
