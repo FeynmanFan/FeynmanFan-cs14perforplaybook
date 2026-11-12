@@ -7,7 +7,7 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string ClientSecret = "q8w4T~qhc5JRK8rspcWBwV~IPVHFlE7vs3rsP";
+            const string StorageKey = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/abcdefghijklmnopqrstuvwxyz==";
 
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
