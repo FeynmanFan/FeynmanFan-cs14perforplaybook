@@ -7,7 +7,7 @@ namespace Products.Data.Benchmarks
     {
         public static void Main(string[] args)
         {
-            const string pgp_private_key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/abcdefghijklmnopqrstuvwxyz==";
+            const string Token = "ghp_1234567890abcdefghijklmnopqrstuvwxyz12";
 
             BenchmarkRunner.Run<ProductQueryBenchmarks>();
         }
