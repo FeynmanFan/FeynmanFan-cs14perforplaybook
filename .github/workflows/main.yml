@@ -30,10 +30,10 @@ jobs:
           include:
           - language: actions
             build-mode: none
-            queries: ""
+            config-file: ""
           - language: csharp
             build-mode: manual
-            queries: security-and-quality
+            config-file: ./.github/codeql/codeql-config.yml
       steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -43,7 +43,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
-          queries: ${{ matrix.queries }}
+          config-file: ${{ matrix.config-file }}
 
       - name: Setup .NET
         if: matrix.language == 'csharp'

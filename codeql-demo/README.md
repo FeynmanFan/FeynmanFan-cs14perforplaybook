@@ -2,9 +2,9 @@
 
 This isolated project demonstrates CodeQL query and SARIF reporting. It does not
 contain a real vulnerability and is not part of the `csharp-performance` solution.
-CI builds this project, but its standard CodeQL query suite does not run the custom
-demo query. The query reports a harmless marker as a synthetic high-severity alert;
-do not treat that alert as a security finding.
+CI builds this project and runs both the standard `security-and-quality` suite and
+the custom demo query. The query reports a harmless marker as a synthetic
+high-severity alert; do not treat that alert as a security finding.
 
 From the repository root in PowerShell, set `$codeql` to the path of your CodeQL
 CLI executable, then run:
